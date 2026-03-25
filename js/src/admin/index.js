@@ -2,7 +2,7 @@ import app from 'flarum/admin/app';
 import AdManagementPage from './components/AdManagementPage';
 
 app.initializers.add('ralkage-ad-management', () => {
-    app.extensionData.for('ralkage-ad-management')
+    app.registry.for('ralkage-ad-management')
         .registerPage(AdManagementPage)
         .registerPermission(
             {
