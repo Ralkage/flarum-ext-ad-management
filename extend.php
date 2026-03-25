@@ -2,9 +2,13 @@
 
 namespace Ralkage\AdManagement;
 
-use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Api\Context;
+use Flarum\Api\Resource\ForumResource;
+use Flarum\Api\Schema;
 use Flarum\Extend;
 use Ralkage\AdManagement\Api\Controller;
+use Ralkage\AdManagement\Api\Resource\AdResource;
+use Ralkage\AdManagement\Api\Resource\AdZoneResource;
 use s9e\TextFormatter\Configurator;
 
 return [
@@ -28,7 +32,7 @@ return [
             $tag->template = '<div class="AdZonePlaceholder" data-zone="{@zone}"></div>';
             $configurator->BBCodes->add('ADZONE', ['defaultAttribute' => 'zone']);
         })
-        ->parse(function ($parser, $context, string $text): string {
+        ->parse(function ($_parser, $_context, string $text): string {
             return preg_replace(
                 '/\{myadvertisements\[([a-z][a-z0-9_-]*)\]\}/i',
                 '[adzone=$1]',
@@ -63,33 +67,29 @@ return [
         })
         ->serializeToForum('adsHideForGroups', 'ralkage-ad-management.hide_ads_for_groups'),
 
-    // API routes for ad management
+    // Resource-based API for ad zones and advertisements
+    new Extend\ApiResource(AdZoneResource::class),
+    new Extend\ApiResource(AdResource::class),
+
+    // Extend ForumResource with actor capabilities
+    (new Extend\ApiResource(ForumResource::class))
+        ->fields(fn () => [
+            Schema\Boolean::make('canManageAds')
+                ->get(fn ($forum, Context $context) => $context->getActor()->isAdmin()),
+
+            Schema\Boolean::make('canViewOwnAds')
+                ->get(fn ($forum, Context $context) => !$context->getActor()->isGuest()),
+
+            Schema\Boolean::make('canSubmitAds')
+                ->get(fn ($forum, Context $context) => !$context->getActor()->isGuest()
+                    && ($context->getActor()->isAdmin() || $context->getActor()->hasPermission('ralkage-ad-management.submitAd'))),
+        ]),
+
+    // Custom routes for tracking (high-frequency, rate-limited) and analytics
     (new Extend\Routes('api'))
-        // Ad zones
-        ->get('/ad-zones', 'ad-zones.index', Controller\ListAdZonesController::class)
-        ->post('/ad-zones', 'ad-zones.create', Controller\CreateAdZoneController::class)
-        ->patch('/ad-zones/{id}', 'ad-zones.update', Controller\UpdateAdZoneController::class)
-        ->delete('/ad-zones/{id}', 'ad-zones.delete', Controller\DeleteAdZoneController::class)
-        // Advertisements - static routes MUST come before parameterized routes
-        ->get('/advertisements', 'advertisements.index', Controller\ListAdsController::class)
-        ->get('/advertisements/active', 'advertisements.active', Controller\ListActiveAdsController::class)
-        ->post('/advertisements', 'advertisements.create', Controller\CreateAdController::class)
-        ->patch('/advertisements/{id}', 'advertisements.update', Controller\UpdateAdController::class)
-        ->delete('/advertisements/{id}', 'advertisements.delete', Controller\DeleteAdController::class)
-        // Tracking
         ->post('/ad-track/click', 'ad-track.click', Controller\TrackAdClickController::class)
         ->post('/ad-track/impression', 'ad-track.impression', Controller\TrackAdImpressionController::class)
-        // Analytics
         ->get('/advertisements/{id}/analytics', 'advertisements.analytics', Controller\AdAnalyticsController::class),
-
-    (new Extend\ApiSerializer(ForumSerializer::class))
-        ->attributes(function ($serializer, $model, $attributes) {
-            $actor = $serializer->getActor();
-            $attributes['canManageAds'] = $actor->isAdmin();
-            $attributes['canViewOwnAds'] = !$actor->isGuest();
-            $attributes['canSubmitAds'] = !$actor->isGuest() && ($actor->isAdmin() || $actor->hasPermission('ralkage-ad-management.submitAd'));
-            return $attributes;
-        }),
 
     // Console commands
     (new Extend\Console())

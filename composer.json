@@ -5,20 +5,26 @@
     "type": "flarum-extension",
     "license": "MIT",
     "require": {
-        "flarum/core": "^1.8"
+        "php": "^8.3",
+        "flarum/core": "^2.0.0-beta.7"
     },
     "authors": [
         {
             "name": "Ralkage",
-            "email": "noreply@ralkage.com"
+            "email": "me@ralkage.com",
+            "homepage": "https://ralkage.com"
         }
     ],
+    "homepage": "https://ralkage.com",
     "autoload": {
         "psr-4": {
             "Ralkage\\AdManagement\\": "src/"
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "2.x-dev"
+        },
         "flarum-extension": {
             "title": "Ad Management",
             "category": "feature",
