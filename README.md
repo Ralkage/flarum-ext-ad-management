@@ -19,14 +19,14 @@ A comprehensive ad management system for [Flarum](https://flarum.org) forums. Su
 
 ## Requirements
 
-- Flarum `^1.8`
-- PHP `^8.0` with GD extension (for image resizing/compression)
+- Flarum `^2.0`
+- PHP `^8.3` with GD extension (for image resizing/compression)
 - PHP `curl` extension (optional, for reSmush.it API compression)
 
 ## Installation
 
 ```bash
-composer require ralkage/flarum-ext-ad-management
+composer require ralkage/flarum-ext-ad-management:^2.0
 ```
 
 Then enable it in your Flarum admin panel under **Extensions**.
