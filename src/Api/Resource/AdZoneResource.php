@@ -27,6 +27,8 @@ class AdZoneResource extends AbstractDatabaseResource
 
     public function scope(Builder $query, BaseContext $context): void
     {
+        $query->withCount('advertisements');
+
         $actor = $context->getActor();
 
         if (!$actor->isAdmin()) {
@@ -38,8 +40,7 @@ class AdZoneResource extends AbstractDatabaseResource
     {
         return [
             Endpoint\Index::make()
-                ->authenticated()
-                ->eagerLoadCount(['advertisements']),
+                ->authenticated(),
 
             Endpoint\Show::make(),
 

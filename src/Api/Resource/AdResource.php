@@ -110,7 +110,6 @@ class AdResource extends AbstractDatabaseResource
         return [
             Endpoint\Index::make()
                 ->paginate(200, 500)
-                ->defaultSort('-priority')
                 ->eagerLoad(['zone'])
                 ->defaultInclude(['zone', 'owner'])
                 ->query(function (object $query, ?OffsetPagination $pagination, Context $context, array $filters): Context {
@@ -171,7 +170,7 @@ class AdResource extends AbstractDatabaseResource
 
             Endpoint\Create::make()
                 ->authenticated()
-                ->can(function ($model, Context $context) {
+                ->can(function (Context $context) {
                     $actor = $context->getActor();
                     if ($actor->isAdmin()) {
                         return null;
