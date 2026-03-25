@@ -202,7 +202,7 @@ export default class AdManagementPage extends ExtensionPage {
         app.request({
             method: 'PATCH',
             url: app.forum.attribute('apiUrl') + '/advertisements/' + ad.id,
-            body: { data: { attributes: { pending_image_action: 'approve' } } },
+            body: { data: { type: 'advertisements', id: String(ad.id), attributes: { pendingImageAction: 'approve' } } },
         }).then(() => this.loadData());
     }
 
@@ -210,7 +210,7 @@ export default class AdManagementPage extends ExtensionPage {
         app.request({
             method: 'PATCH',
             url: app.forum.attribute('apiUrl') + '/advertisements/' + ad.id,
-            body: { data: { attributes: { pending_image_action: 'reject' } } },
+            body: { data: { type: 'advertisements', id: String(ad.id), attributes: { pendingImageAction: 'reject' } } },
         }).then(() => this.loadData());
     }
 
@@ -372,29 +372,40 @@ export default class AdManagementPage extends ExtensionPage {
         const attributes = {
             name: ad.name,
             type: ad.type,
-            zone_id: parseInt(ad.zone_id),
             content: ad.content || null,
-            image_url: ad.image_url || null,
-            link_url: ad.link_url || null,
-            alt_text: ad.alt_text || null,
+            imageUrl: ad.image_url || null,
+            linkUrl: ad.link_url || null,
+            altText: ad.alt_text || null,
             width: ad.width ? parseInt(ad.width) : null,
             height: ad.height ? parseInt(ad.height) : null,
-            is_active: ad.is_active,
-            start_date: ad.start_date || null,
-            end_date: ad.end_date || null,
+            isActive: ad.is_active,
+            startDate: ad.start_date || null,
+            endDate: ad.end_date || null,
             priority: parseInt(ad.priority) || 0,
-            group_visibility: ad.group_visibility ? ad.group_visibility.split(',').map(g => parseInt(g.trim())).filter(Boolean) : null,
-            max_impressions: ad.max_impressions ? parseInt(ad.max_impressions) : null,
-            max_clicks: ad.max_clicks ? parseInt(ad.max_clicks) : null,
-            max_image_changes: ad.max_image_changes ? parseInt(ad.max_image_changes) : null,
+            groupVisibility: ad.group_visibility || null,
+            maxImpressions: ad.max_impressions ? parseInt(ad.max_impressions) : null,
+            maxClicks: ad.max_clicks ? parseInt(ad.max_clicks) : null,
+            maxImageChanges: ad.max_image_changes ? parseInt(ad.max_image_changes) : null,
         };
+
+        const data = {
+            type: 'advertisements',
+            attributes,
+            relationships: {
+                zone: { data: ad.zone_id ? { type: 'ad-zones', id: String(ad.zone_id) } : null },
+            },
+        };
+
+        if (!isNew) {
+            data.id = String(ad.id);
+        }
 
         this.saving = true;
 
         app.request({
             method: isNew ? 'POST' : 'PATCH',
             url: app.forum.attribute('apiUrl') + '/advertisements' + (isNew ? '' : '/' + ad.id),
-            body: { data: { attributes } },
+            body: { data },
         }).then(() => {
             this.editingAd = null;
             this.saving = false;
@@ -570,12 +581,17 @@ export default class AdManagementPage extends ExtensionPage {
             maxHeight: zone.max_height ? parseInt(zone.max_height) : null,
         };
 
+        const data = { type: 'ad-zones', attributes };
+        if (!isNew) {
+            data.id = String(zone.id);
+        }
+
         this.savingZone = true;
 
         app.request({
             method: isNew ? 'POST' : 'PATCH',
             url: app.forum.attribute('apiUrl') + '/ad-zones' + (isNew ? '' : '/' + zone.id),
-            body: { data: { attributes } },
+            body: { data },
         }).then(() => {
             this.editingZone = null;
             this.savingZone = false;
