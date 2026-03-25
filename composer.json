@@ -1,0 +1,32 @@
+{
+    "name": "ralkage/flarum-ext-ad-management",
+    "description": "Comprehensive ad management system for Flarum with zones, analytics, and ad owner self-service.",
+    "keywords": ["flarum", "extension", "ads", "advertising", "ad management", "adsense"],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^1.8"
+    },
+    "authors": [
+        {
+            "name": "Ralkage",
+            "email": "noreply@ralkage.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Ralkage\\AdManagement\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Ad Management",
+            "category": "feature",
+            "icon": {
+                "name": "fas fa-ad",
+                "backgroundColor": "#e74c3c",
+                "color": "#fff"
+            }
+        }
+    }
+}
