@@ -52,7 +52,7 @@ class ListAdsController extends AbstractListController
         $total = $query->count();
 
         $document->addPaginationLinks(
-            app('Flarum\Http\UrlGenerator')->toRoute('advertisements.index'),
+            app('Flarum\Http\UrlGenerator')->to('api')->route('advertisements.index'),
             $request->getQueryParams(),
             $offset,
             $limit,
