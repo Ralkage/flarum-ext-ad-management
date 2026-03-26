@@ -15,6 +15,7 @@ let adsLoading = false;
 let adsError = false;
 let zonePositions = {};
 let zoneNames = {};
+let zoneDisplayModes = {};
 // One randomly selected ad per position/zone, rotated on each page navigation
 let selectedAdByPosition = {};
 let selectedAdByZoneName = {};
@@ -41,11 +42,13 @@ function loadAds() {
         // Build zone maps from included resources
         zonePositions = {};
         zoneNames = {};
+        zoneDisplayModes = {};
         if (response.included) {
             response.included.forEach(item => {
                 if (item.type === 'ad-zones') {
                     zonePositions[item.id] = item.attributes.position;
                     zoneNames[item.id] = item.attributes.name;
+                    zoneDisplayModes[item.id] = item.attributes.displayMode || 'rotate';
                 }
             });
         }
@@ -114,6 +117,20 @@ function selectAdsForRotation() {
     });
 }
 
+function getDisplayModeForPosition(position) {
+    for (const [id, pos] of Object.entries(zonePositions)) {
+        if (pos === position) return zoneDisplayModes[id] || 'rotate';
+    }
+    return 'rotate';
+}
+
+function getDisplayModeForZoneName(zoneName) {
+    for (const [id, name] of Object.entries(zoneNames)) {
+        if (name === zoneName) return zoneDisplayModes[id] || 'rotate';
+    }
+    return 'rotate';
+}
+
 function getAdsByPosition(position) {
     if (!adsCache) return [];
 
@@ -124,6 +141,15 @@ function getAdsByPosition(position) {
     });
 }
 
+function getAdsByZoneName(zoneName) {
+    if (!adsCache) return [];
+    return adsCache.filter(ad => {
+        const zoneRel = ad.relationships?.zone?.data;
+        if (!zoneRel) return false;
+        return zoneNames[zoneRel.id] === zoneName;
+    });
+}
+
 function mountAdPlaceholders(element) {
     if (!adsCache || !element) return;
 
@@ -131,10 +157,16 @@ function mountAdPlaceholders(element) {
         const zoneName = placeholder.getAttribute('data-zone');
         if (!zoneName) return;
 
-        // Show one randomly-selected ad per zone
-        const ad = selectedAdByZoneName[zoneName];
-        if (ad) {
-            m.render(placeholder, m(AdBanner, { key: ad.id, ad }));
+        if (getDisplayModeForZoneName(zoneName) === 'stack') {
+            const ads = getAdsByZoneName(zoneName);
+            if (ads.length > 0) {
+                m.render(placeholder, ads.map(ad => m(AdBanner, { key: ad.id, ad })));
+            }
+        } else {
+            const ad = selectedAdByZoneName[zoneName];
+            if (ad) {
+                m.render(placeholder, m(AdBanner, { key: ad.id, ad }));
+            }
         }
     });
 }
@@ -144,10 +176,21 @@ function shouldHideAds() {
 }
 
 function renderZoneAds(position, className) {
-    // Pick the pre-selected ad for this position (rotation)
+    if (getDisplayModeForPosition(position) === 'stack') {
+        const ads = getAdsByPosition(position);
+        if (ads.length === 0) return null;
+        return (
+            <div className={'AdZone ' + className}>
+                <div className="container">
+                    {ads.map(ad => <AdBanner ad={ad} />)}
+                </div>
+            </div>
+        );
+    }
+
+    // Default: rotate — show one randomly selected ad
     const ad = selectedAdByPosition[position];
     if (!ad) return null;
-
     return (
         <div className={'AdZone ' + className}>
             <div className="container">
@@ -165,8 +208,12 @@ app.initializers.add('ralkage-ad-management', () => {
     function injectHeaderAd() {
         if (shouldHideAds() || !adsCache) return;
 
-        const ad = selectedAdByPosition['header'];
-        if (!ad) return;
+        const isStack = getDisplayModeForPosition('header') === 'stack';
+        const ads = isStack ? getAdsByPosition('header') : [];
+        const singleAd = !isStack ? selectedAdByPosition['header'] : null;
+
+        if (!isStack && !singleAd) return;
+        if (isStack && ads.length === 0) return;
 
         const appHeader = document.getElementById('header');
         if (!appHeader) return;
@@ -181,7 +228,12 @@ app.initializers.add('ralkage-ad-management', () => {
             appHeader.parentNode.insertBefore(container, appHeader);
         }
 
-        m.render(container.querySelector('.container'), m(AdBanner, { key: ad.id, ad }));
+        const inner = container.querySelector('.container');
+        if (isStack) {
+            m.render(inner, ads.map(ad => m(AdBanner, { key: ad.id, ad })));
+        } else {
+            m.render(inner, m(AdBanner, { key: singleAd.id, ad: singleAd }));
+        }
     }
 
     // Add "My Ads" link to user page nav
@@ -219,9 +271,16 @@ app.initializers.add('ralkage-ad-management', () => {
         loadAds();
         if (shouldHideAds() || !adsCache) return;
 
-        const ad = selectedAdByPosition['sidebar'];
-        if (ad) {
-            items.add('adWidget', <AdWidget ads={[ad]} />, -100);
+        if (getDisplayModeForPosition('sidebar') === 'stack') {
+            const ads = getAdsByPosition('sidebar');
+            if (ads.length > 0) {
+                items.add('adWidget', <AdWidget ads={ads} />, -100);
+            }
+        } else {
+            const ad = selectedAdByPosition['sidebar'];
+            if (ad) {
+                items.add('adWidget', <AdWidget ads={[ad]} />, -100);
+            }
         }
     });
 

@@ -137,6 +137,14 @@ class AdZoneResource extends AbstractDatabaseResource
                 ->writable()
                 ->set(fn (AdZone $zone, ?int $value) => $zone->max_height = $value ?: null),
 
+            Schema\Str::make('displayMode')
+                ->property('display_mode')
+                ->get(fn (AdZone $zone) => $zone->display_mode ?: 'rotate')
+                ->writable()
+                ->set(function (AdZone $zone, string $value) {
+                    $zone->display_mode = in_array($value, ['rotate', 'stack'], true) ? $value : 'rotate';
+                }),
+
             Schema\Integer::make('adsCount')
                 ->property('advertisements_count')
                 ->get(fn (AdZone $zone) => (int) ($zone->advertisements_count ?? 0)),
