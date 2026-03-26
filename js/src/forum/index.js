@@ -29,7 +29,7 @@ function loadAds() {
 
     app.request({
         method: 'GET',
-        url: app.forum.attribute('apiUrl') + '/advertisements/active',
+        url: app.forum.attribute('apiUrl') + '/advertisements?filter[active]=1',
         errorHandler: () => {},
     }).then(response => {
         adsCache = response.data || [];
