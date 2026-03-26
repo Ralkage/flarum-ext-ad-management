@@ -93,7 +93,7 @@ return [
             $attributes['canManageAds'] = $actor->isAdmin();
             $attributes['canViewOwnAds'] = !$actor->isGuest();
             $attributes['canSubmitAds'] = !$actor->isGuest() && ($actor->isAdmin() || $actor->hasPermission('ralkage-ad-management.submitAd'));
-            $attributes['adsHidden'] = $actor->groups()
+            $attributes['adsHidden'] = !$actor->isGuest() && $actor->groups()
                 ->whereHas('permissions', function ($query) {
                     $query->where('permission', 'ralkage-ad-management.noAds');
                 })
