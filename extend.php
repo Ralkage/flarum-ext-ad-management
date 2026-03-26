@@ -38,10 +38,12 @@ return [
 
     (new Extend\Settings())
         ->default('ralkage-ad-management.between_posts_interval', 5)
+        ->default('ralkage-ad-management.show_sponsored_label', true)
+        ->default('ralkage-ad-management.sponsored_label_text', '')
         ->default('ralkage-ad-management.default_max_image_changes', 5)
         ->default('ralkage-ad-management.track_impressions', true)
         ->default('ralkage-ad-management.track_clicks', true)
-        ->default('ralkage-ad-management.hide_ads_for_groups', '')
+        ->default('ralkage-ad-management.hide_ads_for_groups', '') // deprecated, kept for backwards compat
         ->default('ralkage-ad-management.adsense_publisher_id', '')
         ->default('ralkage-ad-management.allowed_image_formats', 'jpg,jpeg,png,webp,gif')
         ->default('ralkage-ad-management.enable_compression', false)
@@ -61,7 +63,10 @@ return [
         ->serializeToForum('adsTrackClicks', 'ralkage-ad-management.track_clicks', function ($value) {
             return (bool) $value;
         })
-        ->serializeToForum('adsHideForGroups', 'ralkage-ad-management.hide_ads_for_groups'),
+        ->serializeToForum('adsShowSponsoredLabel', 'ralkage-ad-management.show_sponsored_label', function ($value) {
+            return (bool) $value;
+        })
+        ->serializeToForum('adsSponsoredLabelText', 'ralkage-ad-management.sponsored_label_text'),
 
     // API routes for ad management
     (new Extend\Routes('api'))
@@ -88,6 +93,11 @@ return [
             $attributes['canManageAds'] = $actor->isAdmin();
             $attributes['canViewOwnAds'] = !$actor->isGuest();
             $attributes['canSubmitAds'] = !$actor->isGuest() && ($actor->isAdmin() || $actor->hasPermission('ralkage-ad-management.submitAd'));
+            $attributes['adsHidden'] = $actor->groups()
+                ->whereHas('permissions', function ($query) {
+                    $query->where('permission', 'ralkage-ad-management.noAds');
+                })
+                ->exists();
             return $attributes;
         }),
 

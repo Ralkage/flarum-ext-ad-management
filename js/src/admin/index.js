@@ -13,5 +13,15 @@ app.initializers.add('ralkage-ad-management', () => {
             },
             'reply',
             90
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-eye-slash',
+                label: app.translator.trans('ralkage-ad-management.admin.permissions.no_ads'),
+                permission: 'ralkage-ad-management.noAds',
+                defaultGroup: false,
+            },
+            'view',
+            89
         );
 });

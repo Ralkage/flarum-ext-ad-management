@@ -610,6 +610,24 @@ export default class AdManagementPage extends ExtensionPage {
                 </div>
 
                 <div className="Form-group">
+                    {this.buildSettingComponent({
+                        setting: 'ralkage-ad-management.show_sponsored_label',
+                        type: 'boolean',
+                        label: app.translator.trans('ralkage-ad-management.admin.settings.show_sponsored_label'),
+                        help: app.translator.trans('ralkage-ad-management.admin.settings.show_sponsored_label_help'),
+                    })}
+                </div>
+
+                <div className="Form-group">
+                    <label>{app.translator.trans('ralkage-ad-management.admin.settings.sponsored_label_text')}</label>
+                    <p className="helpText">{app.translator.trans('ralkage-ad-management.admin.settings.sponsored_label_text_help')}</p>
+                    {this.buildSettingComponent({
+                        setting: 'ralkage-ad-management.sponsored_label_text',
+                        type: 'text',
+                    })}
+                </div>
+
+                <div className="Form-group">
                     <label>{app.translator.trans('ralkage-ad-management.admin.settings.default_max_image_changes')}</label>
                     <p className="helpText">{app.translator.trans('ralkage-ad-management.admin.settings.default_max_image_changes_help')}</p>
                     {this.buildSettingComponent({
@@ -633,15 +651,6 @@ export default class AdManagementPage extends ExtensionPage {
                         type: 'boolean',
                         label: app.translator.trans('ralkage-ad-management.admin.settings.track_clicks'),
                         help: app.translator.trans('ralkage-ad-management.admin.settings.track_clicks_help'),
-                    })}
-                </div>
-
-                <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.settings.hide_ads_for_groups')}</label>
-                    <p className="helpText">{app.translator.trans('ralkage-ad-management.admin.settings.hide_ads_for_groups_help')}</p>
-                    {this.buildSettingComponent({
-                        setting: 'ralkage-ad-management.hide_ads_for_groups',
-                        type: 'text',
                     })}
                 </div>
 

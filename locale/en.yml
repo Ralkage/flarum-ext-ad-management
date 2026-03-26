@@ -14,12 +14,14 @@ ralkage-ad-management:
       between_posts_interval_help: "Show an ad after every N posts in discussions. Set to 0 to disable."
       default_max_image_changes: Default Max Image Changes
       default_max_image_changes_help: "Maximum number of times an ad owner can change their ad image. Set to 0 for unlimited."
+      show_sponsored_label: Show "Sponsored" Label
+      show_sponsored_label_help: "Display a label beneath ads. Uncheck to hide it entirely."
+      sponsored_label_text: Sponsored Label Text
+      sponsored_label_text_help: "Custom text for the label (e.g. \"Advertisement\"). Leave blank to use the default translation."
       track_impressions: Track Impressions
       track_impressions_help: "Count how many times each ad is displayed."
       track_clicks: Track Clicks
       track_clicks_help: "Track when users click on ads."
-      hide_ads_for_groups: Hide Ads for Groups
-      hide_ads_for_groups_help: "Comma-separated group IDs that should not see any ads (e.g., premium subscribers)."
       adsense_publisher_id: Google AdSense Publisher ID
       adsense_publisher_id_help: "Your AdSense publisher ID (e.g., ca-pub-1234567890)."
       allowed_image_formats: Allowed Image Formats
@@ -53,6 +55,7 @@ ralkage-ad-management:
 
     permissions:
       submit_ad: Submit Advertisements
+      no_ads: Ad-Free (hide all ads)
 
     # Ad zones
     zones:
