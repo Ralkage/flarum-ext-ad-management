@@ -164,6 +164,13 @@ ralkage-ad-management:
   forum:
     nav:
       my_ads: My Ads
+    ads:
+      name: Ad Name
+      zone: Zone
+      select_zone: Select a zone...
+      image_url: Image URL
+      link_url: Link URL
+      alt_text: Alt Text
     page:
       title: My Advertisements
       empty: You don't have any advertisements yet.
