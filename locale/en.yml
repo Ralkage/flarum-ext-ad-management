@@ -71,6 +71,11 @@ ralkage-ad-management:
       sort_order: Sort Order
       max_width: Max Width (px)
       max_height: Max Height (px)
+      display_mode: Display Mode
+      display_mode_help: "Rotate shows one random ad per page navigation. Stack shows all ads in the zone at once."
+      display_modes:
+        rotate: Rotate
+        stack: Stack All
       default_badge: Default
       ads_count: Ads
       dimensions: Dimensions

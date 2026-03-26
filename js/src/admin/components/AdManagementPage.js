@@ -436,6 +436,7 @@ export default class AdManagementPage extends ExtensionPage {
                             <th>{app.translator.trans('ralkage-ad-management.admin.zones.is_active')}</th>
                             <th>{app.translator.trans('ralkage-ad-management.admin.zones.ads_count')}</th>
                             <th>{app.translator.trans('ralkage-ad-management.admin.zones.dimensions')}</th>
+                            <th>{app.translator.trans('ralkage-ad-management.admin.zones.display_mode')}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -453,6 +454,7 @@ export default class AdManagementPage extends ExtensionPage {
                                     <td>{attrs.isActive ? '✓' : '✗'}</td>
                                     <td>{attrs.adsCount}</td>
                                     <td>{attrs.maxWidth && attrs.maxHeight ? attrs.maxWidth + '×' + attrs.maxHeight : '—'}</td>
+                                    <td>{app.translator.trans('ralkage-ad-management.admin.zones.display_modes.' + (attrs.displayMode || 'rotate'))}</td>
                                     <td className="AdManagement-actions">
                                         <Button className="Button Button--icon" icon="fas fa-edit" onclick={() => this.editZone(zone)} />
                                         {!attrs.isDefault && (
@@ -484,6 +486,7 @@ export default class AdManagementPage extends ExtensionPage {
             sort_order: attrs.sortOrder || 0,
             max_width: attrs.maxWidth || '',
             max_height: attrs.maxHeight || '',
+            display_mode: attrs.displayMode || 'rotate',
             is_default: attrs.isDefault || false,
         };
     }
@@ -547,6 +550,15 @@ export default class AdManagementPage extends ExtensionPage {
                     </div>
                 </div>
 
+                <div className="Form-group">
+                    <label>{app.translator.trans('ralkage-ad-management.admin.zones.display_mode')}</label>
+                    <p className="helpText">{app.translator.trans('ralkage-ad-management.admin.zones.display_mode_help')}</p>
+                    <select className="FormControl" value={zone.display_mode} onchange={e => { zone.display_mode = e.target.value; }}>
+                        <option value="rotate">{app.translator.trans('ralkage-ad-management.admin.zones.display_modes.rotate')}</option>
+                        <option value="stack">{app.translator.trans('ralkage-ad-management.admin.zones.display_modes.stack')}</option>
+                    </select>
+                </div>
+
                 <div className="Form-group AdManagement-formButtons">
                     <Button className="Button" onclick={() => { this.editingZone = null; }}>{app.translator.trans('ralkage-ad-management.admin.cancel')}</Button>
                     <Button className="Button Button--primary" onclick={() => this.saveZone()} loading={this.savingZone}>{app.translator.trans('ralkage-ad-management.admin.save')}</Button>
@@ -568,6 +580,7 @@ export default class AdManagementPage extends ExtensionPage {
             sortOrder: parseInt(zone.sort_order) || 0,
             maxWidth: zone.max_width ? parseInt(zone.max_width) : null,
             maxHeight: zone.max_height ? parseInt(zone.max_height) : null,
+            displayMode: zone.display_mode,
         };
 
         this.savingZone = true;

@@ -65,6 +65,8 @@ class CreateAdZoneController extends AbstractCreateController
         $zone->sort_order = (int) Arr::get($data, 'sortOrder', 0);
         $zone->max_width = Arr::get($data, 'maxWidth') ?: null;
         $zone->max_height = Arr::get($data, 'maxHeight') ?: null;
+        $zone->display_mode = in_array(Arr::get($data, 'displayMode'), ['rotate', 'stack'], true)
+            ? Arr::get($data, 'displayMode') : 'rotate';
         $zone->save();
 
         return $zone;

@@ -21,6 +21,7 @@ class AdZoneSerializer extends AbstractSerializer
             'sortOrder'   => (int) $model->sort_order,
             'maxWidth'    => $model->max_width ? (int) $model->max_width : null,
             'maxHeight'   => $model->max_height ? (int) $model->max_height : null,
+            'displayMode' => $model->display_mode ?: 'rotate',
             'adsCount'    => (int) ($model->advertisements_count ?? $model->advertisements()->count()),
             'createdAt'   => $this->formatDate($model->created_at),
         ];

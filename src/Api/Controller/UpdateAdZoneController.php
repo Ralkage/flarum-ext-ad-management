@@ -70,6 +70,10 @@ class UpdateAdZoneController extends AbstractShowController
         if (Arr::has($data, 'maxHeight')) {
             $zone->max_height = Arr::get($data, 'maxHeight') ?: null;
         }
+        if (Arr::has($data, 'displayMode')) {
+            $value = Arr::get($data, 'displayMode');
+            $zone->display_mode = in_array($value, ['rotate', 'stack'], true) ? $value : 'rotate';
+        }
 
         $zone->save();
 
