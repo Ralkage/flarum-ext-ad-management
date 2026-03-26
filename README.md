@@ -23,6 +23,12 @@ A comprehensive ad management system for [Flarum](https://flarum.org) forums. Su
 - PHP `^8.0` with GD extension (for image resizing/compression)
 - PHP `curl` extension (optional, for reSmush.it API compression)
 
+## Links
+
+- [Ralkage](https://ralkage.com)
+- [Github](https://github.com/Ralkage/flarum-ext-ad-management)
+- [Packagist](https://packagist.org/packages/ralkage/flarum-ext-ad-management)
+
 ## Installation
 
 ```bash
