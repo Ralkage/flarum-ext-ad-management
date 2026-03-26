@@ -90,9 +90,8 @@ return [
                     && ($context->getActor()->isAdmin() || $context->getActor()->hasPermission('ralkage-ad-management.submitAd'))),
 
             Schema\Boolean::make('adsHidden')
-                ->get(fn ($forum, Context $context) => !$context->getActor()->isGuest() && $context->getActor()->groups()
-                    ->whereHas('permissions', fn ($q) => $q->where('permission', 'ralkage-ad-management.noAds'))
-                    ->exists()),
+                ->get(fn ($forum, Context $context) => !$context->getActor()->isGuest()
+                    && $context->getActor()->hasPermission('ralkage-ad-management.noAds')),
         ]),
 
     // Custom routes for tracking (high-frequency, rate-limited) and analytics
