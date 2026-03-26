@@ -15,9 +15,10 @@ let adsLoading = false;
 let adsError = false;
 let zonePositions = {};
 let zoneNames = {};
-// One randomly selected ad per position/zone, chosen fresh on each cache load
+// One randomly selected ad per position/zone, rotated on each page navigation
 let selectedAdByPosition = {};
 let selectedAdByZoneName = {};
+let lastRoute = null;
 const CACHE_TTL = 60000;
 
 function loadAds() {
@@ -62,8 +63,21 @@ function loadAds() {
 }
 
 /**
+ * Re-select ads when the user navigates to a new page.
+ * Flarum is an SPA so hard refreshes are rare; this ensures ads rotate
+ * on every route change instead of staying fixed for the whole session.
+ */
+function rotateAdsOnNavigation() {
+    if (!adsCache) return;
+    const route = m.route.get();
+    if (route !== lastRoute) {
+        lastRoute = route;
+        selectAdsForRotation();
+    }
+}
+
+/**
  * For each position and zone name, randomly select one ad to display.
- * This ensures rotation across page loads while remaining stable during a visit.
  */
 function selectAdsForRotation() {
     selectedAdByPosition = {};
@@ -146,11 +160,10 @@ function renderZoneAds(position, className) {
 app.initializers.add('ralkage-ad-management', () => {
     app.routes['user.ads'] = { path: '/u/:username/ads', component: MyAdsPage };
 
-    // Inject header ad via DOM since there's no good Mithril hook above the header
-    let headerAdInjected = false;
-
+    // Inject header ad via DOM since there's no good Mithril hook above the header.
+    // Re-renders on every call so the ad rotates on each page navigation.
     function injectHeaderAd() {
-        if (headerAdInjected || shouldHideAds() || !adsCache) return;
+        if (shouldHideAds() || !adsCache) return;
 
         const ad = selectedAdByPosition['header'];
         if (!ad) return;
@@ -158,20 +171,17 @@ app.initializers.add('ralkage-ad-management', () => {
         const appHeader = document.getElementById('header');
         if (!appHeader) return;
 
-        // Check if already injected
-        if (document.querySelector('.AdZone--header')) return;
-        headerAdInjected = true;
+        let container = document.querySelector('.AdZone--header');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'AdZone AdZone--header';
+            const inner = document.createElement('div');
+            inner.className = 'container';
+            container.appendChild(inner);
+            appHeader.parentNode.insertBefore(container, appHeader);
+        }
 
-        const container = document.createElement('div');
-        container.className = 'AdZone AdZone--header';
-
-        const inner = document.createElement('div');
-        inner.className = 'container';
-        container.appendChild(inner);
-
-        // Render the single selected ad into the container using Mithril
-        appHeader.parentNode.insertBefore(container, appHeader);
-        m.render(inner, m(AdBanner, { key: ad.id, ad }));
+        m.render(container.querySelector('.container'), m(AdBanner, { key: ad.id, ad }));
     }
 
     // Add "My Ads" link to user page nav
@@ -189,6 +199,7 @@ app.initializers.add('ralkage-ad-management', () => {
     // Index page: below_header, above_footer, footer zones
     extend(IndexPage.prototype, 'view', function (vdom) {
         loadAds();
+        rotateAdsOnNavigation();
         if (shouldHideAds() || !adsCache || !vdom || !vdom.children) return;
 
         injectHeaderAd();
@@ -264,6 +275,7 @@ app.initializers.add('ralkage-ad-management', () => {
     // Discussion page: below_header and footer zones
     extend(DiscussionPage.prototype, 'view', function (vdom) {
         loadAds();
+        rotateAdsOnNavigation();
         if (shouldHideAds() || !adsCache || !vdom || !vdom.children) return;
 
         injectHeaderAd();
