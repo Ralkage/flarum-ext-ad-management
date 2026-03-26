@@ -10,38 +10,38 @@
     }
 
     &--header {
-        background: #f8f9fa;
+        background: var(--control-bg);
         padding: 10px 0;
-        border-bottom: 1px solid #e8ecf0;
+        border-bottom: 1px solid var(--control-bg);
         width: 100%;
         z-index: 999;
     }
 
     &--below-header {
-        background: #f8f9fa;
+        background: var(--control-bg);
         padding: 12px 0;
-        border-bottom: 1px solid #e8ecf0;
+        border-bottom: 1px solid var(--control-bg);
     }
 
     &--between-posts {
         margin: 16px -20px;
         padding: 16px 20px;
-        background: #fafafa;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
+        background: var(--control-bg);
+        border-top: 1px solid var(--control-bg);
+        border-bottom: 1px solid var(--control-bg);
     }
 
     &--above-footer {
-        background: #f8f9fa;
+        background: var(--control-bg);
         padding: 12px 0;
-        border-top: 1px solid #e8ecf0;
+        border-top: 1px solid var(--control-bg);
         margin-top: 20px;
     }
 
     &--footer {
-        background: #f0f2f5;
+        background: var(--control-bg);
         padding: 12px 0;
-        border-top: 1px solid #e0e3e8;
+        border-top: 1px solid var(--control-bg);
     }
 }
 
@@ -82,7 +82,7 @@
 
     &-label {
         font-size: 10px;
-        color: #999;
+        color: var(--muted-color);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-top: 4px;
@@ -128,7 +128,7 @@
 .MyAds-empty {
     text-align: center;
     padding: 40px 20px;
-    color: #888;
+    color: var(--muted-color);
 }
 
 .MyAds-list {
@@ -137,8 +137,8 @@
 }
 
 .MyAds-card {
-    background: #fff;
-    border: 1px solid #e8ecf0;
+    background: var(--body-bg);
+    border: 1px solid var(--control-bg);
     border-radius: 8px;
     padding: 20px;
     transition: box-shadow 0.2s;
@@ -163,7 +163,7 @@
         margin-bottom: 12px;
         border-radius: 4px;
         overflow: hidden;
-        background: #f8f9fa;
+        background: var(--control-bg);
 
         img {
             max-width: 100%;
@@ -183,17 +183,17 @@
 
     &-actions {
         padding-top: 12px;
-        border-top: 1px solid #f0f2f5;
+        border-top: 1px solid var(--control-bg);
     }
 }
 
 .MyAds-stat {
     font-size: 13px;
-    color: #666;
+    color: var(--muted-color);
 
     i {
         margin-right: 4px;
-        color: #999;
+        color: var(--muted-color);
     }
 }
 
@@ -211,8 +211,8 @@
     }
 
     &--inactive {
-        background: #f5f5f5;
-        color: #999;
+        background: var(--control-bg);
+        color: var(--muted-color);
     }
 
     &--scheduled {
@@ -237,8 +237,8 @@
 }
 
 .MyAds-submitForm {
-    background: #fff;
-    border: 1px solid #e8ecf0;
+    background: var(--body-bg);
+    border: 1px solid var(--control-bg);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
@@ -260,7 +260,7 @@
     }
 
     .helpText {
-        color: #888;
+        color: var(--muted-color);
         font-size: 12px;
         margin: 8px 0;
     }
@@ -271,15 +271,36 @@
     gap: 8px;
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid #e8ecf0;
+    border-top: 1px solid var(--control-bg);
 }
 
 .MyAds-changes-info {
     font-size: 12px;
-    color: #888;
+    color: var(--muted-color);
     margin-left: 8px;
 
     &--exhausted {
         color: #c62828;
+    }
+}
+
+// Responsive layout
+@media @phone {
+    .AdBanner {
+        display: block;
+        width: 100%;
+
+        &-link {
+            display: block;
+            width: 100%;
+        }
+
+        &-image {
+            width: 100%;
+        }
+    }
+
+    .AdZone .container {
+        padding: 0 8px;
     }
 }

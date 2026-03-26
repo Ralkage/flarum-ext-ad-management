@@ -126,14 +126,7 @@ function mountAdPlaceholders(element) {
 }
 
 function shouldHideAds() {
-    const hideGroups = app.forum.attribute('adsHideForGroups');
-    if (!hideGroups || !app.session.user) return false;
-
-    const groupIds = hideGroups.split(',').map(id => parseInt(id.trim())).filter(Boolean);
-    if (groupIds.length === 0) return false;
-
-    const userGroups = app.session.user.groups() || [];
-    return userGroups.some(group => groupIds.includes(parseInt(group.id())));
+    return !!app.forum.attribute('adsHidden');
 }
 
 function renderZoneAds(position, className) {

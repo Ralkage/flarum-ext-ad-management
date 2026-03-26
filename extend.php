@@ -45,7 +45,9 @@ return [
         ->default('ralkage-ad-management.default_max_image_changes', 5)
         ->default('ralkage-ad-management.track_impressions', true)
         ->default('ralkage-ad-management.track_clicks', true)
-        ->default('ralkage-ad-management.hide_ads_for_groups', '')
+        ->default('ralkage-ad-management.hide_ads_for_groups', '') // deprecated, kept for backwards compat
+        ->default('ralkage-ad-management.show_sponsored_label', true)
+        ->default('ralkage-ad-management.sponsored_label_text', '')
         ->default('ralkage-ad-management.adsense_publisher_id', '')
         ->default('ralkage-ad-management.allowed_image_formats', 'jpg,jpeg,png,webp,gif')
         ->default('ralkage-ad-management.enable_compression', false)
@@ -65,7 +67,10 @@ return [
         ->serializeToForum('adsTrackClicks', 'ralkage-ad-management.track_clicks', function ($value) {
             return (bool) $value;
         })
-        ->serializeToForum('adsHideForGroups', 'ralkage-ad-management.hide_ads_for_groups'),
+        ->serializeToForum('adsShowSponsoredLabel', 'ralkage-ad-management.show_sponsored_label', function ($value) {
+            return (bool) $value;
+        })
+        ->serializeToForum('adsSponsoredLabelText', 'ralkage-ad-management.sponsored_label_text'),
 
     // Resource-based API for ad zones and advertisements
     new Extend\ApiResource(AdZoneResource::class),
@@ -83,6 +88,11 @@ return [
             Schema\Boolean::make('canSubmitAds')
                 ->get(fn ($forum, Context $context) => !$context->getActor()->isGuest()
                     && ($context->getActor()->isAdmin() || $context->getActor()->hasPermission('ralkage-ad-management.submitAd'))),
+
+            Schema\Boolean::make('adsHidden')
+                ->get(fn ($forum, Context $context) => $context->getActor()->groups()
+                    ->whereHas('permissions', fn ($q) => $q->where('permission', 'ralkage-ad-management.noAds'))
+                    ->exists()),
         ]),
 
     // Custom routes for tracking (high-frequency, rate-limited) and analytics

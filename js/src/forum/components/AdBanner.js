@@ -19,12 +19,18 @@ export default class AdBanner extends Component {
         const attrs = ad.attributes || ad;
         const className = 'AdBanner AdBanner--' + (attrs.type || 'image') + ' ' + (this.attrs.className || '');
 
+        const showLabel = app.forum.attribute('adsShowSponsoredLabel') !== false;
+        const customLabelText = app.forum.attribute('adsSponsoredLabelText');
+        const labelText = customLabelText || app.translator.trans('ralkage-ad-management.forum.ad.sponsored');
+
         return (
             <div className={className} data-ad-id={ad.id}>
                 {this.renderAd(attrs, ad.id)}
-                <div className="AdBanner-label">
-                    {app.translator.trans('ralkage-ad-management.forum.ad.sponsored')}
-                </div>
+                {showLabel && (
+                    <div className="AdBanner-label">
+                        {labelText}
+                    </div>
+                )}
             </div>
         );
     }
