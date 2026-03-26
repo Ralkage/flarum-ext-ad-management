@@ -97,16 +97,16 @@ export default class MyAdsPage extends UserPage {
                 <h3>{app.translator.trans('ralkage-ad-management.forum.page.submit_ad')}</h3>
 
                 <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.ads.name')}</label>
+                    <label>{app.translator.trans('ralkage-ad-management.forum.ads.name')}</label>
                     <input className="FormControl" type="text" value={ad.name}
                         oninput={e => { ad.name = e.target.value; }} />
                 </div>
 
                 <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.ads.zone')}</label>
+                    <label>{app.translator.trans('ralkage-ad-management.forum.ads.zone')}</label>
                     <select className="FormControl" value={ad.zone_id}
                         onchange={e => { ad.zone_id = e.target.value; }}>
-                        <option value="">{app.translator.trans('ralkage-ad-management.admin.ads.select_zone')}</option>
+                        <option value="">{app.translator.trans('ralkage-ad-management.forum.ads.select_zone')}</option>
                         {this.zones.map(zone => (
                             <option value={zone.id}>{zone.attributes.label}</option>
                         ))}
@@ -114,19 +114,19 @@ export default class MyAdsPage extends UserPage {
                 </div>
 
                 <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.ads.image_url')}</label>
+                    <label>{app.translator.trans('ralkage-ad-management.forum.ads.image_url')}</label>
                     <input className="FormControl" type="text" value={ad.image_url}
                         oninput={e => { ad.image_url = e.target.value; }} />
                 </div>
 
                 <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.ads.link_url')}</label>
+                    <label>{app.translator.trans('ralkage-ad-management.forum.ads.link_url')}</label>
                     <input className="FormControl" type="text" value={ad.link_url}
                         oninput={e => { ad.link_url = e.target.value; }} />
                 </div>
 
                 <div className="Form-group">
-                    <label>{app.translator.trans('ralkage-ad-management.admin.ads.alt_text')}</label>
+                    <label>{app.translator.trans('ralkage-ad-management.forum.ads.alt_text')}</label>
                     <input className="FormControl" type="text" value={ad.alt_text}
                         oninput={e => { ad.alt_text = e.target.value; }} />
                 </div>
