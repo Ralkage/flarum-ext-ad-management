@@ -135,9 +135,9 @@ function renderZoneAds(position, className) {
     if (!ad) return null;
 
     return (
-        <div className={'AdZone ' + className} key={'ad-' + position}>
+        <div className={'AdZone ' + className}>
             <div className="container">
-                <AdBanner key={ad.id} ad={ad} />
+                <AdBanner ad={ad} />
             </div>
         </div>
     );
@@ -187,28 +187,20 @@ app.initializers.add('ralkage-ad-management', () => {
     });
 
     // Index page: below_header, above_footer, footer zones
-    extend(IndexPage.prototype, 'view', function (vdom) {
+    extend(IndexPage.prototype, 'contentItems', function (items) {
         loadAds();
-        if (shouldHideAds() || !adsCache || !vdom || !vdom.children) return;
+        if (shouldHideAds() || !adsCache) return;
 
         injectHeaderAd();
 
-        // Below header - insert at position 0 (above hero)
         const belowHeader = renderZoneAds('below_header', 'AdZone--below-header');
-        if (belowHeader) {
-            const heroIdx = vdom.children.findIndex(c =>
-                c && c.attrs && c.attrs.className && typeof c.attrs.className === 'string' && c.attrs.className.includes('Hero')
-            );
-            vdom.children.splice((heroIdx >= 0 ? heroIdx + 1 : 0), 0, belowHeader);
-        }
+        if (belowHeader) items.add('adBelowHeader', belowHeader, 200);
 
-        // Above footer
         const aboveFooter = renderZoneAds('above_footer', 'AdZone--above-footer');
-        if (aboveFooter) vdom.children.push(aboveFooter);
+        if (aboveFooter) items.add('adAboveFooter', aboveFooter, -100);
 
-        // Footer
         const footer = renderZoneAds('footer', 'AdZone--footer');
-        if (footer) vdom.children.push(footer);
+        if (footer) items.add('adFooter', footer, -101);
     });
 
     // Sidebar zone
