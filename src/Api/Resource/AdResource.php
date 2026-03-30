@@ -6,6 +6,7 @@ use Flarum\Api\Context as FlarumContext;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource\AbstractDatabaseResource;
 use Flarum\Api\Schema;
+use Flarum\Api\Sort\SortColumn;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Mail\Mailer;
@@ -57,7 +58,7 @@ class AdResource extends AbstractDatabaseResource
                 ->authenticated()
                 ->defaultInclude(['zone', 'owner'])
                 ->paginate(200)
-                ->defaultSort('-priority,-created_at'),
+                ->defaultSort('-priority,-createdAt'),
             Endpoint\Show::make()
                 ->authenticated()
                 ->defaultInclude(['zone', 'owner']),
@@ -67,6 +68,14 @@ class AdResource extends AbstractDatabaseResource
                 ->authenticated(),
             Endpoint\Delete::make()
                 ->authenticated(),
+        ];
+    }
+
+    public function sorts(): array
+    {
+        return [
+            SortColumn::make('priority'),
+            SortColumn::make('createdAt'),
         ];
     }
 
