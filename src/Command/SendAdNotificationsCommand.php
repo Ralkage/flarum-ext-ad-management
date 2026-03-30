@@ -28,7 +28,7 @@ class SendAdNotificationsCommand extends AbstractCommand
             ->setDescription('Send ad expiration reminders and performance reports to ad owners.');
     }
 
-    protected function fire()
+    protected function fire(): int
     {
         $sent = 0;
 
@@ -39,6 +39,8 @@ class SendAdNotificationsCommand extends AbstractCommand
         }
 
         $this->info("Done. Sent {$sent} email(s).");
+
+        return 0;
     }
 
     protected function sendExpirationReminders(): int

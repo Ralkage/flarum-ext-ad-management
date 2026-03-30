@@ -31,7 +31,7 @@ function loadAds() {
 
     app.request({
         method: 'GET',
-        url: app.forum.attribute('apiUrl') + '/advertisements?filter[active]=1',
+        url: app.forum.attribute('apiUrl') + '/active-ads',
         errorHandler: () => {},
     }).then(response => {
         adsCache = response.data || [];
@@ -180,9 +180,9 @@ function renderZoneAds(position, className) {
         const ads = getAdsByPosition(position);
         if (ads.length === 0) return null;
         return (
-            <div className={'AdZone ' + className}>
+            <div className={'AdZone ' + className} key={'ad-' + position}>
                 <div className="container">
-                    {ads.map(ad => <AdBanner ad={ad} />)}
+                    {ads.map(ad => <AdBanner key={ad.id} ad={ad} />)}
                 </div>
             </div>
         );
@@ -192,9 +192,9 @@ function renderZoneAds(position, className) {
     const ad = selectedAdByPosition[position];
     if (!ad) return null;
     return (
-        <div className={'AdZone ' + className}>
+        <div className={'AdZone ' + className} key={'ad-' + position}>
             <div className="container">
-                <AdBanner ad={ad} />
+                <AdBanner key={ad.id} ad={ad} />
             </div>
         </div>
     );
@@ -249,21 +249,29 @@ app.initializers.add('ralkage-ad-management', () => {
     });
 
     // Index page: below_header, above_footer, footer zones
-    extend(IndexPage.prototype, 'contentItems', function (items) {
+    extend(IndexPage.prototype, 'view', function (vdom) {
         loadAds();
         rotateAdsOnNavigation();
-        if (shouldHideAds() || !adsCache) return;
+        if (shouldHideAds() || !adsCache || !vdom || !vdom.children) return;
 
         injectHeaderAd();
 
+        // Below header - insert at position 0 (above hero)
         const belowHeader = renderZoneAds('below_header', 'AdZone--below-header');
-        if (belowHeader) items.add('adBelowHeader', belowHeader, 200);
+        if (belowHeader) {
+            const heroIdx = vdom.children.findIndex(c =>
+                c && c.attrs && c.attrs.className && typeof c.attrs.className === 'string' && c.attrs.className.includes('Hero')
+            );
+            vdom.children.splice((heroIdx >= 0 ? heroIdx + 1 : 0), 0, belowHeader);
+        }
 
+        // Above footer
         const aboveFooter = renderZoneAds('above_footer', 'AdZone--above-footer');
-        if (aboveFooter) items.add('adAboveFooter', aboveFooter, -100);
+        if (aboveFooter) vdom.children.push(aboveFooter);
 
+        // Footer
         const footer = renderZoneAds('footer', 'AdZone--footer');
-        if (footer) items.add('adFooter', footer, -101);
+        if (footer) vdom.children.push(footer);
     });
 
     // Sidebar zone

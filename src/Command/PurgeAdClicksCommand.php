@@ -22,13 +22,13 @@ class PurgeAdClicksCommand extends AbstractCommand
             );
     }
 
-    protected function fire()
+    protected function fire(): int
     {
         $days = (int) $this->argument('days');
 
         if ($days < 1) {
             $this->error('Days must be at least 1.');
-            return;
+            return 1;
         }
 
         $cutoff = Carbon::now()->subDays($days);
@@ -36,5 +36,7 @@ class PurgeAdClicksCommand extends AbstractCommand
         $deleted = AdClick::where('created_at', '<', $cutoff)->delete();
 
         $this->info("Deleted {$deleted} ad click record(s) older than {$days} days.");
+
+        return 0;
     }
 }

@@ -10,10 +10,13 @@ class Ad extends AbstractModel
 {
     protected $table = 'advertisements';
 
-    protected $dates = ['created_at', 'updated_at', 'start_date', 'end_date', 'last_notified_at'];
-
     protected $casts = [
         'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'last_notified_at' => 'datetime',
     ];
 
     public function zone()

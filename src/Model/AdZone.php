@@ -9,11 +9,11 @@ class AdZone extends AbstractModel
 {
     protected $table = 'ad_zones';
 
-    protected $dates = ['created_at', 'updated_at'];
-
     protected $casts = [
         'is_default' => 'boolean',
         'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function advertisements()
