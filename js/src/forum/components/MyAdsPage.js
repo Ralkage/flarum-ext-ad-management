@@ -76,13 +76,24 @@ export default class MyAdsPage extends UserPage {
         );
     }
 
+    /**
+     * Zones an ad can actually be submitted into. The API only filters inactive
+     * zones out for non-admins, so an admin viewing this page would otherwise be
+     * offered zones that will never render an ad.
+     */
+    submittableZones() {
+        return this.zones.filter(zone => zone.attributes.isActive);
+    }
+
     openSubmitForm() {
+        const zones = this.submittableZones();
+
         this.newAd = {
             name: '',
             image_url: '',
             link_url: '',
             alt_text: '',
-            zone_id: this.zones[0] ? this.zones[0].id : '',
+            zone_id: zones[0] ? zones[0].id : '',
             width: '',
             height: '',
         };
@@ -107,7 +118,7 @@ export default class MyAdsPage extends UserPage {
                     <select className="FormControl" value={ad.zone_id}
                         onchange={e => { ad.zone_id = e.target.value; }}>
                         <option value="">{app.translator.trans('ralkage-ad-management.forum.ads.select_zone')}</option>
-                        {this.zones.map(zone => (
+                        {this.submittableZones().map(zone => (
                             <option value={zone.id}>{zone.attributes.label}</option>
                         ))}
                     </select>
