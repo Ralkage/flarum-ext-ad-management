@@ -42,11 +42,11 @@ ralkage-ad-management:
       image_settings_title: Image Settings
       notifications_title: Email Notifications
       expiration_templates_title: Expiration Email Templates
-      templates_placeholders_expiry: "Available placeholders: {forum_title}, {forum_url}, {owner_name}, {owner_username}, {ad_name}, {days_left}, {expiry_date}, {impressions}, {clicks}. Leave blank to use the default template."
+      templates_placeholders_expiry: "Available placeholders: '{forum_title}', '{forum_url}', '{owner_name}', '{owner_username}', '{ad_name}', '{days_left}', '{expiry_date}', '{impressions}', '{clicks}'. Leave blank to use the default template."
       expiration_subject_template: Subject Template
       expiration_body_template: Body Template
       performance_templates_title: Performance Report Templates
-      templates_placeholders_performance: "Available placeholders: {forum_title}, {forum_url}, {owner_name}, {owner_username}, {ad_count}, {total_impressions}, {total_clicks}, {ctr}, {ad_lines}. Leave blank to use the default template."
+      templates_placeholders_performance: "Available placeholders: '{forum_title}', '{forum_url}', '{owner_name}', '{owner_username}', '{ad_count}', '{total_impressions}', '{total_clicks}', '{ctr}', '{ad_lines}'. Leave blank to use the default template."
       performance_subject_template: Subject Template
       performance_body_template: Body Template
 
