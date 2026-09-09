@@ -88,15 +88,19 @@ class AdResource extends AbstractDatabaseResource
             Schema\Str::make('type')
                 ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin()),
             Schema\Str::make('content')
+                ->nullable()
                 ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin()),
             Schema\Str::make('imageUrl')
                 ->property('image_url')
+                ->nullable()
                 ->writable(),
             Schema\Str::make('linkUrl')
                 ->property('link_url')
+                ->nullable()
                 ->writable(),
             Schema\Str::make('altText')
                 ->property('alt_text')
+                ->nullable()
                 ->writable(),
             Schema\Integer::make('width')
                 ->nullable()
@@ -121,8 +125,9 @@ class AdResource extends AbstractDatabaseResource
                 ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin()),
             Schema\Integer::make('priority')
                 ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin()),
-            Schema\Str::make('groupVisibility')
+            Schema\Arr::make('groupVisibility')
                 ->property('group_visibility')
+                ->nullable()
                 ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin())
                 ->get(fn (Ad $ad) => $ad->group_visibility),
             Schema\Integer::make('impressionsCount')
@@ -153,13 +158,42 @@ class AdResource extends AbstractDatabaseResource
                     return 0;
                 }),
 
+            // Virtual: carries an admin's approve/reject of a member's replacement
+            // image. Applied in saving(), after the image-change handling below,
+            // so that promoting a pending image is not itself counted as a change.
+            Schema\Str::make('pendingImageAction')
+                ->writable(fn ($model, FlarumContext $context) => $context->getActor()->isAdmin())
+                ->hidden()
+                ->set(fn () => null),
+
             Schema\Relationship\ToOne::make('zone')
                 ->type('ad-zones')
+                ->writable()
+                ->requiredOnCreate()
                 ->includable(),
             Schema\Relationship\ToOne::make('owner')
                 ->type('users')
                 ->includable(),
         ];
+    }
+
+    /**
+     * Approve or reject an image a member has submitted to replace the live one.
+     */
+    protected function applyPendingImageAction(Ad $ad, ?string $action): void
+    {
+        if ($action === 'approve' && $ad->pending_image_url) {
+            if ($ad->image_url) {
+                $this->imageService->deleteCompressedImage($ad->image_url);
+            }
+            $ad->image_url = $ad->pending_image_url;
+            $ad->pending_image_url = null;
+        } elseif ($action === 'reject') {
+            if ($ad->pending_image_url) {
+                $this->imageService->deleteCompressedImage($ad->pending_image_url);
+            }
+            $ad->pending_image_url = null;
+        }
     }
 
     public function creating(object $model, Context $context): ?object
@@ -171,14 +205,6 @@ class AdResource extends AbstractDatabaseResource
         // Permission check
         if (! $actor->isAdmin() && ! $actor->hasPermission('ralkage-ad-management.submitAd')) {
             $actor->assertAdmin();
-        }
-
-        // Set zone_id from relationship or attributes
-        $zoneData = Arr::get($body, 'data.relationships.zone.data');
-        if ($zoneData) {
-            $model->zone_id = $zoneData['id'];
-        } elseif ($zoneId = Arr::get($data, 'zone_id')) {
-            $model->zone_id = $zoneId;
         }
 
         if ($actor->isAdmin()) {
@@ -246,31 +272,6 @@ class AdResource extends AbstractDatabaseResource
             $actor->assertAdmin();
         }
 
-        // Handle zone_id from relationship or attributes
-        $zoneData = Arr::get($body, 'data.relationships.zone.data');
-        if ($zoneData) {
-            $model->zone_id = $zoneData['id'];
-        } elseif (Arr::has($data, 'zone_id')) {
-            $model->zone_id = Arr::get($data, 'zone_id');
-        }
-
-        // Handle pending image action (admin approve/reject)
-        if ($isAdmin && Arr::has($data, 'pending_image_action')) {
-            $action = Arr::get($data, 'pending_image_action');
-            if ($action === 'approve' && $model->pending_image_url) {
-                if ($model->image_url) {
-                    $this->imageService->deleteCompressedImage($model->image_url);
-                }
-                $model->image_url = $model->pending_image_url;
-                $model->pending_image_url = null;
-            } elseif ($action === 'reject') {
-                if ($model->pending_image_url) {
-                    $this->imageService->deleteCompressedImage($model->pending_image_url);
-                }
-                $model->pending_image_url = null;
-            }
-        }
-
         // Handle status change
         if (Arr::has($data, 'status') && $isAdmin) {
             $status = Arr::get($data, 'status');
@@ -321,6 +322,13 @@ class AdResource extends AbstractDatabaseResource
                 $model->image_url = $processedUrl;
                 $model->image_changes_count++;
             }
+        }
+
+        // Handle pending image action (admin approve/reject). Deliberately after the
+        // image-change block above: promoting a pending image makes image_url dirty,
+        // and running this first would re-process it and count it as another change.
+        if ($isAdmin && Arr::has($data, 'pendingImageAction')) {
+            $this->applyPendingImageAction($model, Arr::get($data, 'pendingImageAction'));
         }
 
         // Validate link URL
